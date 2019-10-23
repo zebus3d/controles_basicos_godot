@@ -1,6 +1,7 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://texture.jpg" type="Texture" id=1]
+[ext_resource path="res://KinematicBody.gd" type="Script" id=2]
 
 [sub_resource type="ProceduralSky" id=1]
 sky_energy = 0.5
@@ -19,58 +20,9 @@ uv1_triplanar = true
 
 [sub_resource type="BoxShape" id=5]
 
-[sub_resource type="GDScript" id=6]
-script/source = "extends KinematicBody
+[sub_resource type="CubeMesh" id=6]
 
-var speed = 660 
-var gravity = -18
-var velocity = Vector3()
-const jump = 80 
-
-func _physics_process(delta):
-	var dir = Vector3()
-	var rot = Vector3(self.rotation.x, self.rotation.y, self.rotation.z) 
-	
-	if (Input.is_action_pressed(\"KEY_W\") or Input.is_action_pressed(\"ui_up\") ):
-		dir.z -= 1
-	if (Input.is_action_pressed(\"KEY_S\") or Input.is_action_pressed(\"ui_down\")):
-		dir.z += 1
-	if Input.is_action_pressed(\"KEY_A\"):
-		rot.y += 1
-		self.rotation_degrees.y += 1
-	if Input.is_action_pressed(\"KEY_D\"):
-		rot.y -= 1
-		self.rotation_degrees.y -= 1
-
-	if Input.is_action_pressed(\"ui_left\"):
-		dir.x -= 1
-	if Input.is_action_pressed(\"ui_right\") :
-		dir.x += 1
-		
-	# saltar:
-	if is_on_floor():
-		speed = 660
-		if Input.is_action_just_pressed(\"space\"):
-			dir.y = jump
-	else:
-		speed = 750
-
-	dir = dir.normalized()
-	dir = dir * speed * delta
-	
-	velocity.y += delta * gravity + dir.y
-		
-	velocity.x = dir.x
-	velocity.z = dir.z
-	
-	# rotando el vector segun la rotacion del KB_Player:
-	velocity = velocity.rotated(Vector3(0, 1, 0), rot.y)
-	velocity = move_and_slide(velocity, Vector3(0, 1, 0))
-"
-
-[sub_resource type="CubeMesh" id=7]
-
-[sub_resource type="BoxShape" id=8]
+[sub_resource type="BoxShape" id=7]
 
 [node name="main" type="Spatial"]
 
@@ -95,16 +47,16 @@ material/0 = SubResource( 4 )
 shape = SubResource( 5 )
 
 [node name="KinematicBody" type="KinematicBody" parent="."]
-script = SubResource( 6 )
+script = ExtResource( 2 )
 
 [node name="MeshInstance" type="MeshInstance" parent="KinematicBody"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95369, 0 )
-mesh = SubResource( 7 )
+mesh = SubResource( 6 )
 material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="KinematicBody"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95369, 0 )
-shape = SubResource( 8 )
+shape = SubResource( 7 )
 
 [node name="Camera" type="Camera" parent="KinematicBody"]
 transform = Transform( 1, 0, 0, 0, 0.902917, 0.429814, 0, -0.429814, 0.902917, -0.199852, 5.93882, 3.73217 )
